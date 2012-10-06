@@ -94,10 +94,10 @@ operators = {
     }
 
 operators_by_type = {
-    "boolean": ["$notnull"],
-    "float": ["$notnull", "$gt", "$lt", "$between"],
-    "int": ["$notnull", "$gt", "$lt", "$between"],
-    "string": ["$notnull"],
-    "datetime": ["$notnull", "$gt", "$lt", "$between"],
+    "boolean": [],
+    "float": ["$gt", "$lt", "$between"],
+    "int": ["$gt", "$lt", "$between"],
+    "string": [],
+    "datetime": ["$gt", "$lt", "$between"],
     "point": ["$near"],
     }
