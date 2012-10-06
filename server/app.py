@@ -63,7 +63,12 @@ class APIV1(object):
                 page = page - 1
                 if page < 0:
                     page = 0
-                query = query.skip(page * NUM_PER_PAGE).limit(NUM_PER_PAGE)
+                results_per_page = req.GET.get("results_per_page", NUM_PER_PAGE)
+                try:
+                    results_per_page = int(results_per_page)
+                except:
+                    results_per_page = NUM_PER_AGE
+                query = query.skip(page * results_per_page).limit(results_per_page)
                 resp['results'] = list(query)
             return resp
 
