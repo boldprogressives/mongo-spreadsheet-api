@@ -74,20 +74,7 @@ class APIV1(object):
 
         col_val = req.path_info_pop()
         if not col_val:
-            query = collection.find(filter_params)
-            page = req.GET.get("page", "1")
-            try:
-                page = int(page)
-            except:
-                page = 1
-            page = page - 1
-            if page < 0:
-                page = 0
-            ## stupid mongodb bug means we can't just use .distinct with .limit
-            ## https://jira.mongodb.org/browse/SERVER-2130
-            values = query.distinct(column)
-            values = values[page * NUM_PER_PAGE:page * NUM_PER_PAGE + NUM_PER_PAGE]
-            resp = {'values': values}
+            resp = {}
             resp['type'] = get_type(column)
             resp['operators'] = available_operators(column)
             return resp
