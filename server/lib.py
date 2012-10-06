@@ -103,9 +103,9 @@ operators_by_type = {
     }
 
 operator_examples = {
-    "$lt": "10",
-    "$gt": "5",
-    "$between": "5:10 (inclusive)",
+    "$lt": "10 for ints; nov 30 2009 for datetimes",
+    "$gt": "5; nov 26 2009 for datetimes",
+    "$between": "5:10 (inclusive) for ints; or like nov 26 2009:nov 30 2009 for datetimes (or any reasonably unambiguous human readable dates)",
     "$notnull": "",
     "$near": "-73.911232836250306:40.755332089264897:0.2 (longitude, latitude, radius in miles)",
 }
