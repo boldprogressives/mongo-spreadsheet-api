@@ -29,11 +29,13 @@ db = conn[sys.argv[3]]
 collection = db.frisks
 collection.drop()
 
-for col in [ "race", "forceuse", "frisk", "pct",
-             "datetime_dayofweek", "datetime_month", "datetime", "datetime_time"]:
-    collection.ensure_index(col)
-    collection.ensure_index([("loc", pymongo.GEO2D)])
+for col in schema:
+    if schema[col] == "point":
+        collection.ensure_index([(col, pymongo.GEO2D)])
+    else:
+        collection.ensure_index(col)
 
+i = 0
 for row in cols_vals_typed:
     obj = dict(row)
     x = obj.get('x')
@@ -60,10 +62,16 @@ for row in cols_vals_typed:
         dows = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
         import datetime
         
+        datetimestop = datetimestop.replace(":", "")
         try:
             datetimestop = datetime.datetime.strptime(datetimestop, "%m%d%Y%H%M%S")
         except ValueError:
-            datetimestop = datetime.datetime.strptime(datetimestop, "%Y-%m-%d%H%M%S")
+            try:
+                datetimestop = datetime.datetime.strptime(datetimestop, "%Y-%m-%d%H%M%S")
+            except ValueError:
+                print >> sys.stderr, i
+                print >> sys.stderr, obj
+                continue
         obj['datetime_dayofweek'] = dows[datetimestop.weekday()]
         obj['datetime_month'] = datetimestop.month
         obj['datetime'] = datetimestop
@@ -76,3 +84,6 @@ for row in cols_vals_typed:
         obj['datetime_time'] = None
 
     collection.insert(obj)
+    if not i % 20000:
+        print >> sys.stderr, i
+    i += 1
