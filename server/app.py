@@ -8,7 +8,7 @@ conn = pymongo.Connection()
 db = conn["sf_full"]
 collection = db.frisks
 
-from lib import cast_input, operators, available_operators, get_type, NotAnOperator, parse_operator
+from lib import cast_input, operators, available_operators, get_type, NotAnOperator, parse_operator, schema
 
 NUM_PER_PAGE = 1000
 
@@ -54,6 +54,13 @@ class APIV1(object):
                 }
             if filter_params == {}:
                 resp['columns'] = [index['key'].keys()[0] for index in db.system.indexes.find()]
+            else:
+                columns = schema.keys()
+                columns = [col for col in columns 
+                           if col not in filter_params
+                           or not isinstance(filter_params[col], dict)
+                           or filter_params[col].keys() == ['$in']]
+                resp['columns'] = columns
             if include_results:
                 page = req.GET.get("page", "1")
                 try:
@@ -76,7 +83,10 @@ class APIV1(object):
         if not col_val:
             resp = {}
             resp['type'] = get_type(column)
-            resp['operators'] = available_operators(column)
+            if column not in filter_params:
+                resp['operators'] = available_operators(column)
+            else:
+                resp['operators'] = []
             return resp
 
         try:
@@ -85,7 +95,8 @@ class APIV1(object):
             operator, params = None, None
         except (TypeError, ValueError), e:
             return exc.HTTPBadRequest(str(e))
-            
+        if operator is not None and column in filter_params:
+            return exc.HTTPBadRequest("Column %s is already in use with an exact-value match; you cannot use both an operator and an exact-value match on the same column in a single query" % column)
         if operator is None and params is None:
             return self.browse_no_operator(filter_params, args, req, column, col_val)
 
@@ -100,7 +111,8 @@ class APIV1(object):
         col_val = cast_input(column, col_val)
         if column in filter_params:
             if isinstance(filter_params[column], dict):
-                assert filter_params[column].keys() == ["$in"]
+                if filter_params[column].keys() != ["$in"]:
+                    return exc.HTTPBadRequest("Column %s is already in use with an operator; you cannot use both an operator and an exact-value match on the same column in a single query" % column)
                 filter_params[column]["$in"].append(col_val)
             else:
                 filter_params[column] = {"$in": [filter_params[column], col_val]}
