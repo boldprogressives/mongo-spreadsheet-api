@@ -53,7 +53,7 @@ class APIV1(object):
                 'records': query_count.count(),
                 }
             if filter_params == {}:
-                resp['columns'] = query_count.next().keys()
+                resp['columns'] = [index['key'].keys()[0] for index in db.system.indexes.find()]
             if include_results:
                 page = req.GET.get("page", "1")
                 try:
