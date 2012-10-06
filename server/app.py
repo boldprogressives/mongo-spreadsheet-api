@@ -5,7 +5,7 @@ from bson import json_util
 
 import pymongo
 conn = pymongo.Connection()
-db = conn["400k"]
+db = conn["sf_full"]
 collection = db.frisks
 
 from lib import cast_input, operators, available_operators, get_type, NotAnOperator, parse_operator
@@ -44,17 +44,16 @@ class APIV1(object):
         if not column:
             include_results = 'results' in req.GET
             if include_results:
-                if filter_params == {}:
-                    return exc.HTTPBadRequest("You must filter the results before requesting detailed results")
                 values = req.GET.getall("value")
                 if values:
                     args["fields"] = values
             query = collection.find(filter_params, **args)
+            query_count = collection.find(filter_params, **args)
             resp = {
-                'records': query.count(),
+                'records': query_count.count(),
                 }
             if filter_params == {}:
-                resp['columns'] = query.next().keys()
+                resp['columns'] = query_count.next().keys()
             if include_results:
                 page = req.GET.get("page", "1")
                 try:
