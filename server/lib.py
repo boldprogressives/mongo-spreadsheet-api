@@ -101,3 +101,11 @@ operators_by_type = {
     "datetime": ["$gt", "$lt", "$between"],
     "point": ["$near"],
     }
+
+operator_examples = {
+    "$lt": "10",
+    "$gt": "5",
+    "$between": "5:10 (inclusive)",
+    "$notnull": "",
+    "$near": "-73.911232836250306:40.755332089264897:0.2 (longitude, latitude, radius in miles)",
+}
