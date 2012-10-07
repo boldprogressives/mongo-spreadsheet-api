@@ -139,13 +139,13 @@ class APIV1(object):
             _req = req.copy()
             _req.GET['page'] = str(int(_req.GET['page']) + 1 if 'page' in _req.GET else 1)
             qs = "?" + '&'.join('='.join(x) for x in _req.GET.items())
-            ctx['nextpage'] = _req.path_url + qs
+            ctx['nextpage'] = qs
             page = req.GET.get('page', '0')
             _req = req.copy()
             _req.GET['page'] = str(int(_req.GET['page']) - 1 if 'page' in _req.GET else -1)
             if int(_req.GET['page']) > -1 and _req.GET['page'] != page:
                 qs = "?" + '&'.join('='.join(x) for x in _req.GET.items())
-                ctx['prevpage'] = _req.path_url + qs
+                ctx['prevpage'] = qs
             else:
                 ctx['prevpage'] = None
             return tempita.Template(self.results_template).substitute(**ctx)
