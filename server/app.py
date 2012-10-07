@@ -52,23 +52,47 @@ class APIV1(object):
 	<script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
 	<link rel='stylesheet' type='text/css' href='http://stopfrisknyc.github.com/docs/css/table.css'/>
 	<script type='text/javascript' src='http://stopfrisknyc.github.com/docs/js/app.js'></script>
+	<script src='http://api.tiles.mapbox.com/mapbox.js/v0.6.6/mapbox.js'></script>
+	<link href='http://api.tiles.mapbox.com/mapbox.js/v0.6.6/mapbox.css' rel='stylesheet' />
     </head>
     <body>
 	<div class="hero-unit">
 	<h1> Stop and Frisk Data API</h1>
-        <h2>Options for browsing/searching column {{ column }} ({{ type }})</h2>
+        <h2><span class="count">{{ records }}</span> total records match your query</h2>
 	<a class="btn btn-primary btn-large" href="http://github.com/stopfrisknyc/docs">Learn more</a>
 	</div>
-        <form "navbar-search pull-left" method="GET">
-	    Search for exact value: <input id="exact_value" type="text" />
-	    <input type="submit" class="btn" onclick="var val=exact_value.value; window.location.pathname+=val+'/'; return false;" />
-        </form>
-        {{for operator in operators}}
-        <form "navbar-search pull-left" method="GET">
-	    {{operator}}: <input id="{{operator}}" type="text"  class="search-query" placeholder="Search" />
-	    <input type="submit"  class="btn" onclick="var val={{operator}}.value; val='{{operator}}='+val; window.location.pathname+=val+'/'; return false;" /> (e.g. {{examples[operator]}})
-        </form>
-        {{endfor}}
+        <div class="span-12">
+          {{if prevpage is not None}}<a class="btn btn-small" href="{{ prevpage }}">Previous Page</a>{{endif}}
+          {{if nextpage is not None}}<a class="btn btn-primary btn-small" href="{{ nextpage }}">Next Page</a>{{endif}}
+        </div>
+        <table class="table table-striped table-hover table-bordered table-condensed results">
+          <thead>
+            <tr>
+              {{for column in columns}}
+                {{if column in allowed_columns}}
+                <th><a href="{{add_path(column)}}">{{column}}</a></th>
+                {{else}}
+                <th>{{ column }}</th>
+                {{endif}}
+              {{endfor}}
+            </tr>
+          </thead>
+          <tbody>
+            {{for result in results}}
+            <tr>
+              {{for column in columns}}
+              <td class="{{ column }}">
+                {{if column in allowed_columns}}
+                <a href="{{add_path(column, result[column])}}">{{ result[column] }}</a>
+                {{else}}
+                {{result[column]}}
+                {{endif}}
+              </td>
+              {{endfor}}
+            </tr>
+            {{endfor}}
+          </tbody>
+        </table>
     </body>
     </html>
     """)
