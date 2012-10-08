@@ -125,9 +125,9 @@ class APIV1(object):
     def build_html(self, req, json):
 
         def add_path(*path):
-            path_info = req.path_info
+            path_info = req.path_info.rstrip("/")
             path_info += '/'.join(str(i) for i in path) + '/'
-            return req.script_name + path_info + '?' + req.query_string
+            return req.script_name + "/" + path_info + '?' + req.query_string
 
         if 'results' in json:
             ctx = {}
